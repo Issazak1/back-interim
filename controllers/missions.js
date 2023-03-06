@@ -1,90 +1,107 @@
+// Importer le module uuid pour générer des identifiants uniques
 const { v4: uuidv4 } = require("uuid");
 
+// Initialiser un tableau de missions vide
 const data = [
   {
-    id: "da0fef64-7bf3-46b9-8efa-176e632605e7",
-    name: "mission 1",
-  },
-
-  {
-    id: "d7561404-4260-412a-b0ce-00b1843762a4",
-    name: "mission 2",
+    id: "",
+    name: "",
+    ste: "",
+    Sdate: "",
+    Edate: "",
+    inter: "",
   },
 ];
 
-// afficher une mission
-//controller GETALL
+// Obtenir toutes les missions
+// Contrôleur GETALL
 const getAll = (req, res) => {
   res.json(data);
 };
 
-// afficher une mission
-//controller GET
-
+// Obtenir une mission par son ID
+// Contrôleur GET
 const get = (req, res) => {
   const { id } = req.params;
 
-  const missions = data.find((o) => o.id === id);
+  const mission = data.find((o) => o.id === id);
 
-  if (!missions === undefined) {
-    return res.status(404).json({ error: "record not found" });
+  if (mission === undefined) {
+    return res.status(404).json({ error: "Mission non trouvée" });
   }
-  res.json(missions);
+  res.json(mission);
 };
-//ajouter un mission
 
+// Ajouter une mission
 const add = (req, res) => {
-  const { name } = req.body;
+  const { name, ste, Sdate, Edate, inter } = req.body;
+
+  // Vérifier si le nom de la mission est manquant
   if (name == null) {
-    return res.status(400).json({ error: "missing parameter" });
+    return res.status(400).json({ error: "Paramètre manquant" });
   }
 
-  const missions = {
+  // Créer une nouvelle mission avec un identifiant unique
+  const mission = {
     id: uuidv4(),
     name,
+    ste,
+    Sdate,
+    Edate,
+    inter,
   };
 
-  data.push(missions);
-  res.json(missions);
+  // Ajouter la nouvelle mission au tableau
+  data.push(mission);
+  res.json(mission);
 };
 
-//supprimer un mission
-
+// Supprimer une mission par son ID
 const remove = (req, res) => {
   const { id } = req.params;
-  const missionsIndex = data.findIndex((o) => o.id == id);
-  if (missionsIndex === -1) {
-    return res.status(404).json({ error: "record not found!" });
+  const missionIndex = data.findIndex((o) => o.id == id);
+
+  // Vérifier si la mission n'existe pas
+  if (missionIndex === -1) {
+    return res.status(404).json({ error: "Mission non trouvée" });
   }
 
-  data.splice(missionsIndex, 1);
+  // Supprimer la mission du tableau
+  data.splice(missionIndex, 1);
 
   return res.status(204).send();
 };
 
-//Modifier un mission
-
+// Modifier une mission par son ID
 const edit = (req, res) => {
-  const {id} = req.params; 
-  const {name} = req.body;
-  if(name == null){ 
-    return res.status(404).json({ error: "missing parameter" });
-  }
-  const missions = data.find((o) => o.id == id);
-  if (missions === undefined){
-return res.status(404).json({ error: "record not found!" });
+  const { id } = req.params;
+  const { name, ste, Sdate, Edate, inter } = req.body;
+
+  // Vérifier si le nom de la mission est manquant
+  if (name == null) {
+    return res.status(400).json({ error: "Paramètre manquant" });
   }
 
-  missions.name = name;
-  return res.json(missions);
-}
+  // Trouver la mission correspondante dans le tableau
+  const mission = data.find((o) => o.id == id);
 
+  // Vérifier si la mission n'existe pas
+  if (mission === undefined) {
+    return res.status(404).json({ error: "Mission non trouvée" });
+  }
 
+  // Mettre à jour les propriétés de la mission
+  mission.id = id;
+  mission.name = name;
+  mission.ste = ste;
+  mission.Sdate = Sdate;
+  mission.Edate = Edate;
+  mission.inter = inter;
 
+  return res.json(mission);
+};
 
-
-
-//exporter la methode cree pour les routes
+// Exporter les fonctions pour les routes
 module.exports = {
   getAll: getAll,
   get: get,
